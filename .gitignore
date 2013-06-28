@@ -22,3 +22,9 @@ __pycache__/
 *.gch
 *.out
 
+*.info
+*.pdf
+*.ps
+*.dvi
+*.gz
+
