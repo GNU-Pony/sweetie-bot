@@ -1,4 +1,4 @@
 Sweetie Bot is a automated package repository cannibaliser.
 Meaning that it downloads all package build and install
-instructions it founds from other distributions and converts
+instructions it finds from other distributions and converts
 there instructions to another package system.
