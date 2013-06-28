@@ -1,0 +1,24 @@
+# Staging-free zone, you can but personal or temporary files in any directory named _
+_/
+
+.*
+!.git*
+
+\#*\#
+*~
+*.bak
+*.sw[op]
+
+bin/
+obj/
+
+__pycache__/
+*.py[co]
+
+*.class
+*.jar
+
+*.o
+*.gch
+*.out
+
