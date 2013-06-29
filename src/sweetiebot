@@ -32,11 +32,13 @@ for arg in "$@"; do
     fi
 done
 
+MODULE_DIR='/usr/lib/sweetie-bot/'
+
 MODULES=()
 
 echo 'Scanning...'
 
-find '/usr/lib/sweetie-bot' | grep -v '~$' | while read module; do
+find "$MODULE_DIR" | grep -v '~$' | while read module; do
     . "$module"
     if [ ! $? = 0 ]; then
 	echo -e '\e[31mHelp, assistence is required. I believe there is something wrong with me!\e[00m'
@@ -55,4 +57,47 @@ if [ ! ${#MODULES[@]} = 0 ]; then
 else
     echo 'Insuffient about of modules, none has been locaeted!'
 fi
+
+echo 'The fun levels will be at maximum efficiency!'
+echo 'I should locate my ignore list, settings other objects of FUN.'
+
+. '/etc/sweetie-bot.conf'
+
+echo 'Humm, insufficient beauty...'
+
+_sorted=()
+for mod in "${MODULES[@]}"; do
+    echo "${mod:${#MODULE_DIR}}"
+done | sort | while read mod; do
+    _sorted+=( "$mod" )
+done
+MODULES=( "${_sorted[@]}" )
+
+for exit_value in ${PIPESTATUS[*]}; do
+    if [ ! $exit_value = 0 ]; then
+	echo 'My primary function is failure!'
+	exit $exit_value
+    fi
+done
+
+_sorted=()
+for mod in "${IGNORE[@]}"; do
+    echo "$mod"
+done | sort | while read mod; do
+    _sorted+=( "$mod" )
+done
+IGNORE=( "${_sorted[@]}" )
+
+for exit_value in ${PIPESTATUS[*]}; do
+    if [ ! $exit_value = 0 ]; then
+	echo 'My primary function is failure!'
+	exit $exit_value
+    fi
+done
+
+echo 'I have arranges objects in a estatically pleasing manner.'
+
+
+
+echo 'SUCCESS!!!'
 
