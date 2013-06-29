@@ -12,6 +12,7 @@
 @c --- start of do not touch ---
 @set MODULE_DIR /usr/lib/sweetie-bot
 @set CONFFILE /etc/sweetie-bot.conf
+@set COMMAND sweetiebot
 @c --- end of do not touch ---
 
 
