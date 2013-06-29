@@ -28,6 +28,7 @@ echo
 for arg in "$@"; do
     if [ "$arg" = "--water" ]; then
 	echo "Augh, but the water makes me feel funny."
+	echo
     fi
 done
 
