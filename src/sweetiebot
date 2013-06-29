@@ -65,6 +65,8 @@ SETTINGS:
 	exit 0
     elif [ "$arg" = "--copying" ] || [ "$arg" = "-c" ]; then
 	cat <<.
+sweetie-bot — Automated package repository cannibaliser
+
 Copyright © 2013  Mattias Andrée (maandree@member.fsf.org)
 
 This program is free software: you can redistribute it and/or modify
