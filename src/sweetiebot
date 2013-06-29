@@ -23,13 +23,18 @@ MODULE_DIR='/usr/lib/sweetie-bot/'
 CONFFILE='/etc/sweetie-bot.conf'
 VERSION=1.0
 
+_dash="—"
+if [ "$TERM" = "linux" ]; then
+    _dash="-"
+done
+
 for arg in "$@"; do
     if [ "$arg" = "--water" ]; then
 	echo "Augh, but the water makes me feel funny."
 	echo
     elif [ "$arg" = "--help" ] || [ "$arg" = "-h" ] || [ "$arg" = "-?" ]; then
 	cat <<.
-sweetie-bot — Automated package repository cannibaliser
+sweetie-bot ${_dash} Automated package repository cannibaliser
 
 Sweetie Bot is a automated package repository cannibaliser.
 Meaning that it downloads all package build and install
