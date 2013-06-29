@@ -1,0 +1,86 @@
+\input texinfo   @c -*-texinfo-*-
+
+@c %**start of header
+@setfilename sweetie-bot.info
+@settitle sweetie-bot
+@afourpaper
+@documentencoding UTF-8
+@documentlanguage en
+@finalout
+@c %**end of header
+
+@c --- start of do not touch ---
+@set MODULE_DIR /usr/lib/sweetie-bot
+@set CONFFILE /etc/sweetie-bot.conf
+@c --- end of do not touch ---
+
+
+@dircategory Scroll maintenance
+@direntry
+* sweetie-bot: (sweetie-bot).        Automated package repository cannibaliser
+@end direntry
+
+
+@copying
+Copyright @copyright{} 2013 Mattias Andrée
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts. A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+@end quotation
+@end copying
+
+@ifnottex
+@node Top
+@top sweetie-bot -- Automated package repository cannibaliser
+@insertcopying
+@end ifnottex
+
+@titlepage
+@title sweetie-bot
+@subtitle Automated package repository cannibaliser
+@author by Mattias Andrée (maandree)
+
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@page
+@*@*
+@center `Cutie mark acquisition program.'
+@*@*
+@center `Cutie mark acquisition program.'
+@*@*
+@center `Cutie mark acquisition program.'
+@*@*
+@center `The fun begins immediately!'
+@end titlepage
+
+@contents
+
+
+
+@menu
+* Overview::                        Brief overview of @command{sweetie-bot}.
+* Invoking::                        Invoking @command{sweetie-bot}.
+* GNU Free Documentation License::  Copying and sharing this manual.
+@end menu
+
+
+
+@node Overview
+@chapter Overview
+
+@node Invoking
+@chapter Invoking
+
+
+@node GNU Free Documentation License
+@appendix GNU Free Documentation License
+@include fdl.texinfo
+
+@bye
+
