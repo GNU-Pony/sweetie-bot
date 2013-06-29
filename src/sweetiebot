@@ -22,3 +22,12 @@
 echo 'Scroll acquisition program.'
 echo 'The fun begins immediately!'
 
+echo
+echo
+
+for arg in "$@"; do
+    if [ "$arg" = "--water" ]; then
+	echo "Augg, but the water makes me feel funny."
+    fi
+done
+
