@@ -19,20 +19,76 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
-echo 'Scroll acquisition program.'
-echo 'The fun begins immediately!'
-
-echo
-echo
+MODULE_DIR='/usr/lib/sweetie-bot/'
+CONFFILE='/etc/sweetie-bot.conf'
+VERSION=1.0
 
 for arg in "$@"; do
     if [ "$arg" = "--water" ]; then
 	echo "Augh, but the water makes me feel funny."
 	echo
+    elif [ "$arg" = "--help" ] || [ "$arg" = "-h" ] || [ "$arg" = "-?" ]; then
+	cat <<.
+sweetie-bot — Automated package repository cannibaliser
+
+Sweetie Bot is a automated package repository cannibaliser.
+Meaning that it downloads all package build and install
+instructions it finds from other distributions and converts
+their instructions to another package system.
+
+Modules are located in ${MODULE_DIR} and
+${CONFFILE} is the configurations file.
+
+
+USAGE:  sweetiebot [--version | --copying | --help]
+
+
+OPTIONS:
+        -v  --version    Prints the program name and version.
+
+        -c  --copying    Prints copyright information.
+
+        -h  --help       Prints preciesly this.
+
+
+SETTINGS:
+        IGNORE           Modules to ignore.
+
+        MODULES          Only modules to use.
+
+        DISTRO           Output distribution at package convertion.
+                         (GNU/Pony by default)
+.
+	exit 0
+    elif [ "$arg" = "--version" ] || [ "$arg" = "-v" ]; then
+	echo "Sweetie Bot v$VERSION"
+	exit 0
+    elif [ "$arg" = "--copying" ] || [ "$arg" = "-c" ]; then
+	cat <<.
+Copyright © 2013  Mattias Andrée (maandree@member.fsf.org)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+.
+	exit 0
     fi
 done
 
-MODULE_DIR='/usr/lib/sweetie-bot/'
+echo 'Scroll acquisition program.'
+echo 'The fun begins immediately!'
+
+echo
+echo
 
 MODULES=()
 
@@ -58,7 +114,9 @@ fi
 echo 'The fun levels will be at maximum efficiency!'
 echo 'I should locate my ignore list, settings other objects of FUN.'
 
-. '/etc/sweetie-bot.conf'
+if [ -e "$CONFFILE" ]; then
+    . "$CONFFILE"
+fi
 
 echo 'Humm, insufficient beauty...'
 
