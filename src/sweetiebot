@@ -39,10 +39,11 @@ MODULES=()
 echo 'Scanning...'
 
 find "$MODULE_DIR" | grep -v '~$' | while read module; do
-    . "$module"
-    if [ ! $? = 0 ]; then
-	echo -e '\e[31mHelp, assistence is required. I believe there is something wrong with me!\e[00m'
-    fi
+    MODULES+=( "$module" )
+#    . "$module"
+#    if [ ! $? = 0 ]; then
+#	echo -e '\e[31mHelp, assistence is required. I believe there is something wrong with me!\e[00m'
+#    fi
 done
 
 for exit_value in ${PIPESTATUS[*]}; do
