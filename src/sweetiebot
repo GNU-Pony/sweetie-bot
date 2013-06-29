@@ -40,10 +40,6 @@ echo 'Scanning...'
 
 find "$MODULE_DIR" | grep -v '~$' | while read module; do
     MODULES+=( "$module" )
-#    . "$module"
-#    if [ ! $? = 0 ]; then
-#	echo -e '\e[31mHelp, assistence is required. I believe there is something wrong with me!\e[00m'
-#    fi
 done
 
 for exit_value in ${PIPESTATUS[*]}; do
@@ -98,7 +94,22 @@ done
 
 echo 'I have arranges objects in a estatically pleasing manner.'
 
+function list
+{
+    for element in "$@"; do
+	echo "$element"
+    done
+}
 
+comm -23 <(list "${MODULES[@]}") <(list "${IGNORE[@]}") | while read module; do
+    echo "Running ${module}, the changes of success is att 100 %."
+    . "$module"
+    if [ ! $? = 0 ]; then
+	echo -e '\e[31mHelp, assistence is required. I believe there is something wrong with me!\e[00m'
+    else
+	start || echo -e '\e[31mHelp, assistence is required. I believe there is something wrong with me!\e[00m'
+    fi
+done
 
 echo 'SUCCESS!!!'
 
