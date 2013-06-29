@@ -31,3 +31,24 @@ for arg in "$@"; do
     fi
 done
 
+MODULES=()
+
+echo 'Scanning...'
+
+find '/usr/lib/sweetie-bot' | grep -v '~$' | while read module; do
+    . "$module"
+done
+
+for exit_value in ${PIPESTATUS[*]}; do
+    if [ ! $exit_value = 0 ]; then
+	echo "Oops, an error has occurred."
+	exit $exit_value
+    fi
+done
+
+if [ ! ${#MODULES[@]} = 0 ]; then
+    echo 'Modules located.'
+else
+    echo 'Insuffient about of modules, none has been locaeted!'
+fi
+
