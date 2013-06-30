@@ -157,7 +157,7 @@ for exit_value in ${PIPESTATUS[*]}; do
     fi
 done
 
-echo 'I have arranged objects in a estatically pleasing manner.'
+echo 'I have arranged objects in an estatically pleasing manner.'
 
 function list
 {
