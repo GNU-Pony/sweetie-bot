@@ -10,9 +10,11 @@ LIB = /lib
 SYSCONF = /etc
 MODULES = $(PREFIX)$(LIB)
 PKGNAME = sweetie-bot
-SHEBANG = $(BIN)/bash
 COMMAND = sweetiebot
 LICENSES = $(DATA)/licenses
+
+BASH_SHEBANG = $(BIN)/bash
+PY3_SHEBANG = /usr$(BIN)/env python3
 
 MODULE_DIR = $(MODULES)/$(PKGNAME)
 CONFFILE = $(SYSCONF)/$(PKGNAME).conf
@@ -37,7 +39,7 @@ info: sweetie-bot.info.gz
 
 sweetiebot: src/sweetiebot
 	cp "$<" "$@"
-	sed -i 's:^#!/usr/bin/env bash$$:#!$(SHEBANG):' "$@"
+	sed -i 's:^#!/usr/bin/env bash$$:#!$(BASH_SHEBANG):' "$@"
 	sed -i "s:^MODULE_DIR=/usr/lib/sweetie-bot$$:MODULE_DIR='$(MODULE_DIR)':" "$@"
 	sed -i "s:^CONFFILE=/etc/sweetie-bot.conf$$:CONFFILE='$(CONFFILE)':" "$@"
 

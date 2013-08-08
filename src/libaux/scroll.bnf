@@ -1,0 +1,283 @@
+/**
+ * Copying and distribution of this file, with or without modification,
+ * are permitted in any medium without royalty provided the copyright
+ * notice and this notice are preserved.  This file is offered as-is,
+ * without any warranty.  [GNUAllPermissive]
+ */
+
+
+ENDMARKER    \Z
+NEWLINE      [\n\r]
+LETTER       [^\'\"\n\r]
+NAME         [_a-zA-Z][_a-zA-Z0-9]*
+BINARY       0b[0-1]+
+OCTAL        0o[0-7]+
+HEXADECIMAL  0x[0-9a-fA-F]+
+DECIMAL      [0-9]+
+
+
+%%
+
+
+code : multi_statement_n+ ENDMARKER
+;
+
+_ : (' ' | '\t' | '\\' _ NEWLINE)* | (comment _)
+;
+
+newline : comment | NEWLINE
+;
+
+indent : _
+;
+
+name_part : NAME
+;
+
+name : name_part (_ '.' _ name_part)*
+;
+
+multi_statement : [indent statement [_ ';' _ statement]+ [_ ';']] _
+;
+
+multi_statement_n : multi_statement_n newline
+;
+
+statement : simple_statment | compound_statement
+;
+
+compound_statement : (if_statement
+		   | elif_statement
+		   | else_statement
+		   | while_statement
+		   | for_statement
+		   | try_statement
+		   | except_statement
+		   | finally_statement
+		   | with_statement
+		   | function_definition) _ ':' _ [multi_statement]
+;
+
+if_statement : 'if' _ value
+;
+
+elif_statement : 'elif' _ value
+;
+
+else_statement : 'else' _ value
+;
+
+while_statement : 'while' _ value
+;
+
+for_statement : 'for' _ value _ 'in' _ value
+;
+
+try_statement : 'try'
+;
+
+except_statement : 'except' [_ value [_ 'as' _ name]]
+;
+
+finally_statement : 'finally'
+;
+
+with_statement : 'with' [_ value [_ 'as' _ name]]
+;
+
+parameters : name (_ ',' _ name)*
+;
+
+function_definition : 'def' _ name _ '(' _ [parameters _] ')'
+;
+
+assignment : '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^='
+	   | '<<=' | '>>=' | '**=' | '//=' | '='
+;
+
+simple_statment : assignment_statment | flow_statment | return_statment | raise_statment
+		| value | global_statement | nonlocal_statement | import_statement
+;
+
+assignment_statment : value _ assignment _ value
+;
+
+flow_statment : 'pass' | 'break' | 'continue' | 'return'
+;
+
+return_statment : 'return' [_ value]
+;
+
+raise_statment : 'raise' _ value
+;
+
+arguments : value (_ ',' _ value)*
+;
+
+variable : name
+;
+
+function_call : value [_ '(' _ [arguments _] ')']
+;
+
+item : value [_ '[' _ arguments _ ']']
+;
+
+slice_range : slice_left_open | slice_right_open | slice_open | slice_closed
+;
+
+slice_left_open : ':' _ value
+;
+
+slice_right_open : value _ ':'
+;
+
+slice_open : ':'
+;
+
+slice_closed : value _ ':' _ value
+;
+
+slice : value [_ '[' _ slice_range _ [':' _ value _] ']']
+;
+
+tuple : '(' _ value (_ ',' _ value)* ')'
+;
+
+list : '[' _ value (_ ',' _ value)* ']'
+;
+
+dictionary_entry : value [_ ':' _ value]
+;
+
+dictionary : '{' _ dictionary_entry (_ ',' _ dictionary_entry)* '}'
+;
+
+literal : false | true | none | number | string
+;
+
+false : 'False'
+;
+
+true : 'True'
+;
+
+none : 'None'
+;
+
+inline_if : value _ 'if' _ value _ 'else' _ value
+;
+
+inline_for : '[' _ value _ 'for' _ value _ 'in' _ value _ ']'
+;
+
+atom : variable | literal | tuple | list | dictionary | inline_if
+     | inline_for | comparsion | function_call | item | slice | lambda
+;
+
+value : atom | calculation
+;
+
+global_statement : 'global' _ name (_ ',' _ name)*
+;
+
+nonlocal_statement : 'nonlocal' _ name (_ ',' _ name)*
+;
+
+import_statement : [import_from _] 'import' _ ('*' | import_as (_ ',' _ import_as)*)
+;
+
+import_from : 'from' _ name
+;
+
+import_as : name [_ 'as' _ name]
+;
+
+lambda : 'lambda' [ _ '('] _ [name (_ ',' _ name)*] [')' _] ':' _ value
+;
+
+comparitor : '<' | '>' | '==' | '>=' | '<=' | '<>' | '!='
+	   | 'in' | ('not' _ 'in') | 'is' | ('is' _ 'not')
+;
+
+comparsion : value _ comparitor _ value
+;
+
+unary : '+' | '-' | '~' | '!'
+;
+
+shift : '<<' | '>>'
+;
+
+hyper1 : '-' | '+'
+;
+
+hyper2 : '*' | '/' | '//' | '%'
+;
+
+calc_or : calc_xor (_ '|' _ calc_xor)*
+;
+
+calc_xor : calc_and (_ '^' _ calc_and)*
+;
+
+calc_and : calc_shift (_ '&' _ calc_shift)*
+;
+
+calc_shift | calc_hyper1 (_ shift _ calc_hyper1)*
+;
+
+calc_hyper1 | calc_hyper2 (_ hyper1 _ calc_hyper1)*
+;
+
+calc_hyper2 | calc_power (_ hyper2 _ calc_power)*
+;
+
+calc_power : calc_term (_ '**' _ calc_term)*
+;
+
+calc_term : unary _ atom
+;
+
+calculation : calc_or
+;
+
+number : binary | octal | decimal | hexadecimal
+;
+
+binary : BINARY
+;
+
+octal : OCTAL
+;
+
+hexadecimal : HEXADECIMAL
+;
+
+decimal : (DECIMAL ['.' [DECIMAL]]) | ('.' DECIMAL)
+;
+
+string : single_string (_ single_string)*
+;
+
+single_string : ('\'' (escape | letter_s | NEWLINE)* '\'')
+	      | ('\"' (escape | letter_d | NEWLINE)* '\"')
+;
+
+letter_s : letter_e | '\"'
+;
+
+letter_d : letter_e | '\''
+;
+
+escape : '\\' letter_e
+;
+
+comment : '#' (letter_e | '\"' | '\'')* NEWLINE
+;
+
+letter_e : LETTER
+;
+
+%%
+
