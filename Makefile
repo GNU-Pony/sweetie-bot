@@ -50,6 +50,7 @@ install: sweetiebot sweetie-bot.info.gz
 	install -m644 COPYING LICENSE -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)"
 	install -dm755 -- "$(DESTDIR)$(PREFIX)$(DATA)/info"
 	install -m644 sweetie-bot.info.gz -- "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info.gz"
+	install -Dm644 config/sweetie-bot.conf -- "$(DESTDIR)$(CONFFILE)"
 
 
 
@@ -59,6 +60,7 @@ uninstall:
 	-rm -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)/LICENSE"
 	-rmdir -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)"
 	-rm -- "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info.gz"
+	-rm -- "$(DESTDIR)$(CONFFILE)"
 
 
 
