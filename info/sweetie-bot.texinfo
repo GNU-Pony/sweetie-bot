@@ -67,6 +67,8 @@ Texts. A copy of the license is included in the section entitled
 @menu
 * Overview::                        Brief overview of @command{sweetie-bot}.
 * Invoking::                        Invoking @command{sweetie-bot}.
+* Configuring::                     Configuring @command{sweetie-bot}.
+* Modules::                         Package repository crawling modules.
 * GNU Free Documentation License::  Copying and sharing this manual.
 @end menu
 
@@ -75,8 +77,107 @@ Texts. A copy of the license is included in the section entitled
 @node Overview
 @chapter Overview
 
+Sweetie Bot is a automated package repository cannibaliser.
+Meaning that it downloads all package build and install
+instructions it finds from other distributions and converts
+their instructions to another package system.
+
+
+
 @node Invoking
 @chapter Invoking
+
+Sweetie Bot is invoked with the command @command{@value{COMMAND}},
+and it optionally takes a spooler command as it is first argument,
+an empty can be used to skip it, optionally follow by additional
+arguments to invoke it with.
+
+The spooler command is a command that is invoked with a package
+name and a package file in the format for the distribution
+sweetie bot is converting to.
+
+Sweetie Bot supports three options for getting information
+about Sweetie Bot, all of which can only be used exclusively.
+
+@table @option
+@item -v
+@itemx --version
+Prints the program name and version.
+
+@item -c
+@itemx --copying
+Prints copyright information.
+
+@item -h
+@itemx --help
+Prints preciesly this.
+@end table
+
+Sweetie Bot can invoke itself with a command that is meant
+for internal use, but nothing stops you from running it yourself:
+
+@code{@value{COMMAND} ---out-conv DISTRIBUTION PACKAGE_NAME SPIKE_SCROLL}
+
+This commmand [@option{---out-conv}] will print a the filename of
+a package it generates from the distribution @var{DISTRIBUTION}.
+
+
+
+@node Configuring
+@chapter Configuring
+
+Sweetie bots configurations are stored in @file{@value{CONFFILE}}.
+This configuration file is formated in GNU Bash, and contains four
+variables.
+
+@table @asis
+@item @var{MODULES} (manditory array)
+Modules to use for crawling package repositories.
+
+@item @var{IGNORE} (optional array)
+Modules to ignore.
+
+@item @var{DISTRO} (optional scalar)
+Output distribution at package convertion, defaults to GNU/Pony.
+
+@item @var{SPOOLER} (optional scalar)
+The spooler command that is invoked with a package name and a
+package file in the format for the distribution sweetie bot is
+converting to.
+
+@end table
+
+@var{DISTRO} and @var{SPOOLER} can be set via an environment variable,
+if it does not appear in the configuration file.
+
+
+
+@node Modules
+@chapter Modules
+
+A module is a GNU Bash script used for crawling and converting packages
+for a specific distribution. Modules are installed in @value{MODULE_DIR}.
+
+A module file should be named a the distribution, including blank spaces.
+Forward slashes are allowed, but it is prefered to use a hyphen. However,
+it is prefered to lower case instread of uppe case.
+
+A module file must include two functions.
+
+@table @code
+@item start
+Starts crawling package repositories.
+
+When a new package is found it should convert it to a GNU/Pony Spike
+scroll and call Sweetie Bot's function @command{push} with the package
+name and the Spike scroll file it has created.
+
+@item convert package_name spike_scroll
+Convert a GNU/Pony Spike scroll to the format used by the distribution
+this module crawls.
+
+@end table
+
 
 
 @node GNU Free Documentation License
