@@ -24,12 +24,23 @@ VERSION=1.0
 _dash="—"
 if [ "$TERM" = "linux" ]; then
     _dash="-"
-done
+fi
+
+_out_conv=0
+_args=()
+
+__="$*"
+if [ "${__:0:5}" = "I am " ] || [ "${__:0:4}" = "I'm " ]; then
+    echo 'Input name: Sweetie Belle'
+    exit 0
+fi
 
 for arg in "$@"; do
     if [ "$arg" = "--water" ]; then
 	echo "Augh, but the water makes me feel funny."
 	echo
+    elif [ "$arg" = "---out-conv" ]; then
+	_out_conv=1
     elif [ "$arg" = "--help" ] || [ "$arg" = "-h" ] || [ "$arg" = "-?" ]; then
 	cat <<.
 sweetie-bot ${_dash} Automated package repository cannibaliser
@@ -43,7 +54,7 @@ Modules are located in ${MODULE_DIR} and
 ${CONFFILE} is the configurations file.
 
 
-USAGE:  sweetiebot [--version | --copying | --help]
+USAGE:  sweetiebot [-v | -c | -h] [(SPOOLER | '') [spooler_extra_args]]
 
 
 OPTIONS:
@@ -61,6 +72,9 @@ SETTINGS:
 
         DISTRO           Output distribution at package convertion.
                          (GNU/Pony by default)
+
+        SPOOLER          Program to invoked with <name> <file>
+                         when a package has been converted.
 .
 	exit 0
     elif [ "$arg" = "--version" ] || [ "$arg" = "-v" ]; then
@@ -86,14 +100,36 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .
 	exit 0
+    else
+	_args+=( "$arg" )
     fi
 done
+
+set "${_args[@]}"
+
+if [ ${_out_conv} = 1 ]; then
+    . "${_distro}"
+    convert "${_scroll}" "${_file}"
+    exit 0
+fi
 
 echo 'Scroll acquisition program.'
 echo 'The fun begins immediately!'
 
 echo
 echo
+
+_distro=''
+if [[ ! "${DISTRO}" =~ ^([Gg][Nn][Uu][/+-][Pp][Oo][Nn][Yy]|)$ ]]; then
+    _distro="${MODULE_DIR}/${DISTRO}"
+    if [ ! -e "$_distro" ]; then
+	echo "Cannot locate output module ${DISTRO}."
+	exit 1
+    elif [ ! -f "$_distro" ]; then
+	echo "Output module ${DISTRO} is not a regular file."
+	exit 1
+    fi
+fi
 
 MODULES=()
 
@@ -113,7 +149,7 @@ done
 if [ ! ${#MODULES[@]} = 0 ]; then
     echo 'Modules located.'
 else
-    echo 'Insuffient about of modules, none has been locaeted!'
+    echo 'Insuffient about of modules, none has been located!'
 fi
 
 echo 'The fun levels will be at maximum efficiency!'
@@ -122,6 +158,11 @@ echo 'I should locate my ignore list, settings other objects of FUN.'
 if [ -e "$CONFFILE" ]; then
     . "$CONFFILE"
 fi
+
+if [ ! "$1" = '' ]; then
+    SPOOLER="$1"
+fi
+shift
 
 echo 'Humm, insufficient beauty...'
 
@@ -164,12 +205,33 @@ function list
     done
 }
 
+function push
+{
+    _scroll="$1"
+    _file="$2"
+    echo "${_scroll} perpare to be assimilated into to fun squad!"
+    if [ ! "${_distro}" = '' ]; then
+        _scroll="$("$0" ---out-conv "${_distro}" "${_scroll}" "${_file}")"
+	if [ ! $? = 0 ]; then
+	    echo "To convert file ${_file} to ${DISTRO}. Sweete Belle sad. Beep boop beep."
+	    return 1
+	fi
+    fi
+    "$SPOOLER" "${_scroll}" "${_file}" "$@"
+    if [ ! $? = 0 ]; then
+	echo "Failed to add scroll ${_file}. Sweete Belle sad. Beep boop beep."
+	return 1
+    fi
+    return 0
+}
+
 comm -23 <(list "${MODULES[@]}") <(list "${IGNORE[@]}") | while read module; do
-    echo "Running ${module} module, the changes of success is at 100 %."
+    echo "Running ${module} module, the changes of success is at 100 %!"
     . "$module"
     if [ ! $? = 0 ]; then
 	echo -e '\e[31mHelp, assistence is required. I believe there is something wrong with me!\e[00m'
     else
+	echo 'Prepare your eye sockets for visual delight and good time shenanigans'
 	start || echo -e '\e[31mHelp, assistence is required. I believe there is something wrong with me!\e[00m'
     fi
 done
