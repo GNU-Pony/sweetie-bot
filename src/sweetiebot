@@ -54,7 +54,7 @@ Modules are located in ${MODULE_DIR} and
 ${CONFFILE} is the configurations file.
 
 
-USAGE:  sweetiebot [-v | -c | -h] [(SPOOLER | '') [spooler_extra_arg...]]
+USAGE:  sweetiebot [-v | -c | -h | (SPOOLER | '') [spooler_extra_arg...]]
 
 
 OPTIONS:
