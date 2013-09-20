@@ -27,13 +27,13 @@ doc: info
 
 info: sweetie-bot.info.gz
 
-%.texinfo.install: info/%.texinfo
+info/%.texinfo.install: info/%.texinfo
 	cp "$<" "$@"
 	sed -i 's:^@set MODULE_DIR /usr/lib/sweetie-bot$$:@set MODULE_DIR $(MODULE_DIR):' "$@"
 	sed -i 's:^@set CONFFILE /etc/sweetie-bot.conf$$:@set CONFFILE $(CONFFILE):' "$@"
 	sed -i 's:^@set COMMAND sweetiebot$$:@set COMMAND $(COMMAND):' "$@"
 
-%.info.gz: %.texinfo.install
+%.info.gz: info/%.texinfo.install
 	makeinfo "$<"
 	gzip -9 -f "$*.info"
 
