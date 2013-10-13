@@ -17,9 +17,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+
 MODULE_DIR='/usr/lib/sweetie-bot/'
 CONFFILE='/etc/sweetie-bot.conf'
 VERSION=1.0
+
+
+# Prevent cron from starting multiple instances,
+# I do not know if cron will actually ever start
+# a job if it is already still running, but that
+# does not really matter, we should prevent this
+# from happening on any similar program and any
+# future or passed version.
+_lockfile='/run/lock/sweetie-bot'
+if [ ! "${UID}" = 0 ]; then # I am not root
+    _lockfile='/tmp/sweetie-bot/lock/${UID}-${USER}'
+fi
+exec 100<>"${_lockfile}"
+flock --exclusive --nonblock
+if [ ! $? = 0 ]; then
+    echo "$0: ${_lockfile} is already locked."
+    exit 1
+fi
+
 
 _dash="—"
 if [ "$TERM" = "linux" ]; then
@@ -237,4 +257,9 @@ comm -23 <(list "${MODULES[@]}") <(list "${IGNORE[@]}") | while read module; do
 done
 
 echo 'SUCCESS!!!'
+
+
+# Unlock and close lock file
+flock --unlock
+exec 100<&-
 
