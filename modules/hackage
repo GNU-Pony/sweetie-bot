@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+
+##
+# sweetie-bot – Automated package repository cannibaliser
+# 
+# Copyright © 2013  Mattias Andrée (maandree@member.fsf.org)
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+
+################################################################
+# 
+#  Hackage module for sweetie-bot.
+# 
+#  Hackage (hackage.haskell.org) is distribution independent
+#  package repository for programs and libraries written in
+#  Haskell.
+# 
+################################################################
+
+
+
+function start
+{
+    statedir=/var/lib/sweetie-bot/modules/hackage
+    spooldir=/var/spool/sweetie-bot/modules/hackage
+    if [ ! "${UID}" = 0 ]; then # I am not root
+	statedir=~/.local/var/lib/sweetie-bot/modules/hackage
+	spooldir=~/.spool/sweetie-bot/modules/hackage
+    fi
+    
+    mkdir -p "${statedir}" || exit 1
+    mkdir -p "${spooldir}" || exit 1
+    
+    # List file of all Hackage packages
+    packagelist="${spooldir}/packages"
+    
+    # Remove package list if empty, so we can start over
+    if [ -e "${packagelist}" ]; then
+	if [ ! -f "${packagelist}" ]; then
+	    echo "${packagelist} exists but is not a regular file"
+	    exit 1
+	fi
+	if [ "$(wc -l < "${packagelist}")" = 1 ]; then
+	    rm -- "${packagelist}"
+	fi
+    fi
+    
+    # Get list of Hackage package if we have none
+    if [ ! -e "${packagelist}" ]; then
+	wget http://hackage.haskell.org/packages -O - | 
+            grep -Po 'href="/package/[^>]+"' |
+            sed -e 's:^href="/package/\(.*\)"$:\1:g' >
+	    "${packagelist}"
+    fi
+    
+    # Convert all packages
+    while true; do
+	# Get next package
+	package="$(head -n 1 < "${packagelist}")"
+	if [ -z "$package" ]; then
+	    rm -- "${packagelist}"
+	    break
+	fi
+	
+	# List file of all versions of current package
+	versionlist="${spooldir}/versions-${package}"
+	
+	# Remove list and go to next package if empty
+	if [ -e "${packagelist}" ]; then
+	    if [ ! -f "${packagelist}" ]; then
+		echo "${packagelist} exists but is not a regular file"
+		exit 1
+	    fi
+	    if [ "$(wc -l < "${packagelist}")" = 1 ]; then
+		rm -- "${packagelist}"
+		continue
+	    fi
+	fi
+	
+	# Get all versions if we do not already have a list
+	if [ ! -e "${versionlist}" ]; then
+	    wget "http://hackage.haskell.org/package/${package}" -O - |
+	        grep -Po 'href="/package/'"${package}"'-[^>]+"' |
+		sed -e 's:"::g' |
+		cut -d / -f 3 |
+		cut -d - -f 1 --complement |
+		uniq >
+		"${versionlist}"
+	fi
+	
+	# Convert all versions of the package
+	while true; do
+	    # Get next version
+	    version="$(head -n 1 < "${versionlist}")"
+	    if [ -z "$version" ]; then
+		rm -- "${versionlist}"
+		break
+	    fi
+	    
+	    # Unspool current version (atomically)
+	    tail -n $(( $(wc -l < "${versionlist}") - 1 )) < "${versionlist}" > "${versionlist}~"
+	    mv -- "${versionlist}~" "${versionlist}"
+	    
+	    # Perform conversion
+	    from_hackage "${package}" "${version}" "${statedir}" "${spooldir}"
+	done
+	
+	# Unspool current package (atomically)
+	tail -n $(( $(wc -l < "${packagelist}") - 1 )) < "${packagelist}" > "${packagelist}~"
+	mv -- "${packagelist}~" "${packagelist}"
+    done
+}
+
+
+function from_hackage
+{
+    package="$1"
+    version="$2"
+    statedir="$3"
+    spooldir="$4"
+}
+
+
+function convert
+{
+    package_name="$1"
+    spike_scroll="$2"
+    
+    echo 'Converting GNU/Pony Spike is currently not supported by the Hackage module'
+    exit 1
+}
+
