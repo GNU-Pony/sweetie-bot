@@ -257,7 +257,7 @@ function push
 }
 
 comm -23 <(list "${MODULES[@]}") <(list "${IGNORE[@]}") | while read module; do
-    echo "Running ${module} module, the changes of success is at 100 %!"
+    echo "Running ${module} module, the changes of success are at 100 %!"
     . "$module"
     if [ ! $? = 0 ]; then
 	echo -e '\e[31mHelp, assistence is required. I believe there is something wrong with me!\e[00m'
