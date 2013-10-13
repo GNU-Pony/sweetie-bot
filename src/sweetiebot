@@ -125,7 +125,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     fi
 done
 
-set "${_args[@]}"
+if [ ! ${#_args[@]} = 0 ]; then
+    set "${_args[@]}"
+fi
 
 if [ ${_out_conv} = 1 ]; then
     . "${_distro}"
@@ -151,12 +153,20 @@ if [[ ! "${DISTRO}" =~ ^([Gg][Nn][Uu][/+-][Pp][Oo][Nn][Yy]|)$ ]]; then
     fi
 fi
 
+if [ -L "$MODULE_DIR" ]; then
+    _scan='find -L'
+else
+    _scan="find"
+fi
+
 MODULES=()
 
 echo 'Scanning...'
 
-find "$MODULE_DIR" | grep -v '~$' | while read module; do
-    MODULES+=( "$module" )
+for mod in $($_scan $MODULE_DIR | grep -v "~$"); do
+    if [ ! "$mod" = "$MODULE_DIR" ]; then
+        MODULES+=( "$module" )
+    fi
 done
 
 for exit_value in ${PIPESTATUS[*]}; do
@@ -169,7 +179,8 @@ done
 if [ ! ${#MODULES[@]} = 0 ]; then
     echo 'Modules located.'
 else
-    echo 'Insuffient about of modules, none has been located!'
+    echo 'Insufficient amount of modules, none have been located!'
+    exit 1    # because if we can't find any modules, why go on further?
 fi
 
 echo 'The fun levels will be at maximum efficiency!'
@@ -233,7 +244,7 @@ function push
     if [ ! "${_distro}" = '' ]; then
         _scroll="$("$0" ---out-conv "${_distro}" "${_scroll}" "${_file}")"
 	if [ ! $? = 0 ]; then
-	    echo "To convert file ${_file} to ${DISTRO}. Sweete Belle sad. Beep boop beep."
+	    echo "Failed to convert file ${_file} to ${DISTRO}. Sweete Belle sad. Beep boop beep."
 	    return 1
 	fi
     fi
