@@ -95,7 +95,7 @@ function start
 	        grep -Po 'href="/package/'"${package}"'-[^>]+"' |
 		sed -e 's:"::g' |
 		cut -d / -f 3 |
-		cut -d - -f 1 --complement |
+		sed -e 's:.*-::g' |
 		uniq > "${versionlist}"
 	fi
 	
