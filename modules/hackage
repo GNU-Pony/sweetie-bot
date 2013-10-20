@@ -130,7 +130,7 @@ function from_hackage
     statedir="$3"
     spooldir="$4"
     
-    echo "Found hackage package ${package} version ${version}."
+    echo "Found hackage package ${package} version ${version}"
 }
 
 
