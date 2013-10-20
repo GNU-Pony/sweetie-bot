@@ -1,0 +1,12 @@
+Write modules for archive networks:
+
+      Name					Contains:	URL:				Status:
+      The Comprehensive TeX Archive Network	TeX		http://www.ctan.org		Not started
+      The Comprehensive Perl Archive Network	Perl		http://www.cpan.org		Not started
+      The Comprehensive Erlang Archive Network	Erlang		http://cean.process-one.net	Not started
+      The Comprehensive R Archive Network	R		http://cran.r-project.org	Not started
+      Hackage		  	  		Haskell		http://hackage.haskell.org	Crawling
+      RubyGems					Ruby		https://rubygems.org		Not started
+      LuaRocks					Lua		http://www.luarocks.org/en	Not started
+      Python Package Index			Python		https://pypi.python.org/pypi	Not started
+
