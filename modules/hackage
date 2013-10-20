@@ -131,6 +131,57 @@ function from_hackage
     spooldir="$4"
     
     echo "Found hackage package ${package} version ${version}"
+    
+    # Download hackage page to memory
+    package_site="$(wget "http://hackage.haskell.org/package/${package}-${version}" -O -)"
+    if [ ! $? = 0 ]; then
+	echo 'It seems that your have lost your Internet connection, or alterntively, that Hackage is down'
+	exit 1
+    fi
+    
+    # Download cabal file to memory
+    cabal_file="$(wget "http://hackage.haskell.org/package/${package}-${version}/${package}.cabal" -O -)"
+    if [ ! $? = 0 ]; then
+	echo 'It seems that your have lost your Internet connection, or alterntively, that Hackage is down'
+	exit 1
+    fi
+    
+    # Sanitise package name
+    _package="$(echo "${package}" | sed -e 'y:QWERTYUIOPASDFGHJKLZXCVBNM:qwertyuiopasdfghjklzxcvbnm:')"
+    pkgname="$(echo "${_package}" | sed -e 's:[^a-z0-9\._\+\-]::g' -e 's:^[\.\-]*::')"
+    [ "${pkgname}" = "${_package}" ]
+    warn_pkgname=$?
+    
+    # Add haskell- prefix if not a program, i.e. a library
+    echo "${package_site}" | grep 'href="/packages/tag/program"' >/dev/null
+    if [ ! $? = 0 ]; then
+	pkgname="haskell-${pkgname}"
+    fi
+    
+    # Get short package description
+    pkgdesc="$(cat "${cabal_file}" | cabal_field synopsis)"
+    
+    # Get URL
+    upstream="$(cat "${cabal_file}" | cabal_field homepage)"
+    if [ -z "$upstream" ]; then
+	upstream="http://hackage.haskell.org/package/${package}"
+    fi
+    
+    # Get license
+    license=( $(cat "${cabal_file}" | cabal_field license) )
+}
+
+
+function cabal_field
+{
+    echo "$x" | sed 's:\t: :g' | awk 'BEGIN {s = 0}
+    {
+       if ($0 ~ "^'"$1"' *:") {s = 1}
+       else if ((s == 1) && ($0 ~ "^ ")) {s = 1}
+       else {s = 0}
+       if (s == 1) {print $0}
+    }' | sed -e ':a;N;$!ba;s:\n *: :g' -e 's:^'"$1"' *\:::g' |
+         sed -e 's:^ *::g' -e 's: $::g' -e 's:  *: :g'
 }
 
 
