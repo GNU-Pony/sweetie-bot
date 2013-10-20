@@ -129,6 +129,8 @@ function from_hackage
     version="$2"
     statedir="$3"
     spooldir="$4"
+    
+    echo "Found hackage package ${package} version ${version}."
 }
 
 
