@@ -31,12 +31,16 @@ VERSION=1.0
 # future or passed version.
 _lockfile='/run/lock/sweetie-bot'
 if [ ! "${UID}" = 0 ]; then # I am not root
-    _lockfile='/tmp/sweetie-bot/lock/${UID}-${USER}'
+    _lockfile="/tmp/sweetie-bot/lock/${UID}-${USER}"
+    mkdir -p '/tmp/sweetie-bot/lock'
 fi
-exec 100<>"${_lockfile}"
-flock --exclusive --nonblock
+touch "${_lockfile}"
+exec 100<"${_lockfile}"
+flock --exclusive --nonblock 100
 if [ ! $? = 0 ]; then
     echo "$0: ${_lockfile} is already locked."
+    flock --unlock 100
+    exec 100<&-
     exit 1
 fi
 
@@ -52,6 +56,8 @@ _args=()
 __="$*"
 if [ "${__:0:5}" = "I am " ] || [ "${__:0:4}" = "I'm " ]; then
     echo 'Input name: Sweetie Belle'
+    flock --unlock 100
+    exec 100<&-
     exit 0
 fi
 
@@ -96,9 +102,13 @@ SETTINGS:
         SPOOLER          Program to invoked with <name> <file>
                          when a package has been converted.
 .
+	flock --unlock 100
+	exec 100<&-
 	exit 0
     elif [ "$arg" = "--version" ] || [ "$arg" = "-v" ]; then
 	echo "Sweetie Bot v$VERSION"
+	flock --unlock 100
+	exec 100<&-
 	exit 0
     elif [ "$arg" = "--copying" ] || [ "$arg" = "-c" ]; then
 	cat <<.
@@ -119,6 +129,8 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .
+	flock --unlock 100
+	exec 100<&-
 	exit 0
     else
 	_args+=( "$arg" )
@@ -132,6 +144,8 @@ fi
 if [ ${_out_conv} = 1 ]; then
     . "${_distro}"
     convert "${_scroll}" "${_file}"
+    flock --unlock 100
+    exec 100<&-
     exit 0
 fi
 
@@ -146,9 +160,13 @@ if [[ ! "${DISTRO}" =~ ^([Gg][Nn][Uu][/+-][Pp][Oo][Nn][Yy]|)$ ]]; then
     _distro="${MODULE_DIR}/${DISTRO}"
     if [ ! -e "$_distro" ]; then
 	echo "Cannot locate output module ${DISTRO}."
+	flock --unlock 100
+	exec 100<&-
 	exit 1
     elif [ ! -f "$_distro" ]; then
 	echo "Output module ${DISTRO} is not a regular file."
+	flock --unlock 100
+	exec 100<&-
 	exit 1
     fi
 fi
@@ -172,6 +190,8 @@ done
 for exit_value in ${PIPESTATUS[*]}; do
     if [ ! $exit_value = 0 ]; then
 	echo 'Oops, an error has occurred.'
+	flock --unlock 100
+	exec 100<&-
 	exit $exit_value
     fi
 done
@@ -180,6 +200,8 @@ if [ ! ${#MODULES[@]} = 0 ]; then
     echo 'Modules located.'
 else
     echo 'Insufficient amount of modules, none have been located!'
+    flock --unlock 100
+    exec 100<&-
     exit 1    # because if we can't find any modules, why go on further?
 fi
 
@@ -208,6 +230,8 @@ MODULES=( "${_sorted[@]}" )
 for exit_value in ${PIPESTATUS[*]}; do
     if [ ! $exit_value = 0 ]; then
 	echo 'My primary function is failure!'
+	flock --unlock 100
+	exec 100<&-
 	exit $exit_value
     fi
 done
@@ -223,6 +247,8 @@ IGNORE=( "${_sorted[@]}" )
 for exit_value in ${PIPESTATUS[*]}; do
     if [ ! $exit_value = 0 ]; then
 	echo 'My primary function is failure!'
+	flock --unlock 100
+	exec 100<&-
 	exit $exit_value
     fi
 done
@@ -245,6 +271,8 @@ function push
         _scroll="$("$0" ---out-conv "${_distro}" "${_scroll}" "${_file}")"
 	if [ ! $? = 0 ]; then
 	    echo "Failed to convert file ${_file} to ${DISTRO}. Sweete Belle sad. Beep boop beep."
+	    flock --unlock 100
+	    exec 100<&-
 	    return 1
 	fi
     fi
@@ -271,6 +299,6 @@ echo 'SUCCESS!!!'
 
 
 # Unlock and close lock file
-flock --unlock
+flock --unlock 100
 exec 100<&-
 
