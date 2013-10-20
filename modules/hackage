@@ -62,8 +62,7 @@ function start
     if [ ! -e "${packagelist}" ]; then
 	wget http://hackage.haskell.org/packages -O - | 
             grep -Po 'href="/package/[^>]+"' |
-            sed -e 's:^href="/package/\(.*\)"$:\1:g' >
-	    "${packagelist}"
+            sed -e 's:^href="/package/\(.*\)"$:\1:g' > "${packagelist}"
     fi
     
     # Convert all packages
@@ -97,8 +96,7 @@ function start
 		sed -e 's:"::g' |
 		cut -d / -f 3 |
 		cut -d - -f 1 --complement |
-		uniq >
-		"${versionlist}"
+		uniq > "${versionlist}"
 	fi
 	
 	# Convert all versions of the package
