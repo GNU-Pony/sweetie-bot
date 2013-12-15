@@ -181,8 +181,8 @@ MODULES=()
 
 echo 'Scanning...'
 
-for mod in $($_scan $MODULE_DIR | grep -v "~$"); do
-    if [ ! "$mod" = "$MODULE_DIR" ]; then
+for module in $($_scan $MODULE_DIR | grep -v "~$"); do
+    if [ ! "$module" = "$MODULE_DIR" ]; then
         MODULES+=( "$module" )
     fi
 done
