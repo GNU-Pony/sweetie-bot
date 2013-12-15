@@ -169,7 +169,57 @@ function from_hackage
     fi
     
     # Get license
-    license=( $(cat "${cabal_file}" | cabal_field license | vertical | fix_license ) )
+    license=( $(cat "${cabal_file}" | cabal_field license | fix_license) )
+    
+    # The scroll file that is being created
+    scroll_file="${spooldir}/${package}=${version}.scroll"
+    exec 10>"${scroll_file}"
+    
+    # Add some basic information to the scroll
+    (
+	echo '# -*- python -*-'
+	# Justification for applying the GNUAllPermissive license:
+	#   Cabal files on hackages are distributioned without an associated
+	#   license. Due to the nature of the files and the wide spread use
+	#   of derivations of them (including on FSDG distributions) it is
+	#   reasonable to assume that they are public domain or that the authors
+	#   are in agreement. These extensive changes, which in turn will be
+	#   followed by manual changes, legitimate applying a new licenses,
+	#   espically an all permissive one for the sake of having a license
+	#   as fallback if it is rules to not be public domain.
+	echo '# Copying and distribution of this file, with or without modification,'
+	echo '# are permitted in any medium without royalty provided the copyright'
+	echo '# notice and this notice are preserved.  This file is offered as-is,'
+	echo '# without any warranty.  [GNUAllPermissive]'
+	echo 'from dragonsuite import *'
+	echo ''
+	echo "pkgname = '${pkgname}'"
+	echo "version = '${version}'"
+	echo "pkgdesc = '${pkgdesc}'"
+	echo "upstream = '${upstream}'"
+	echo 'arch = []'
+	echo -n 'freedom = SOFTWARE | MEDIA ## FIX'
+	echo 'ME : set to actual freedoms!'
+	echo "license = [$(make_pyarray ${license[@]})]"
+	echo "private = SUPPORTED"
+    ) >&10
+    
+    # Close scroll file
+    exec 10<&-
+}
+
+
+# Make a string array in Python syntax without enclusing brackets
+function make_pyarray
+{
+    rc=""
+    if [ ! $# = 0 ]; then
+	for elem in "$@"; do
+	    rc="${rc}, '${elem}'"
+	done
+	rc="${rc:2}"
+    fi
+    echo "${rc}"
 }
 
 
@@ -187,7 +237,8 @@ function vertical
 # Change license names to those used in Spike scrolls
 function fix_license
 {
-    sed -e 's:^BSD3$:nBSD:g' \
+    vertical | sed \
+	-e 's:^BSD3$:nBSD:g' \
 	-e 's:^BSD2$:sBSD:g' \
 	-e 's:^BSD4$:BSD:g'
 }
