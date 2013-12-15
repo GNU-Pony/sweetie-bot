@@ -200,7 +200,7 @@ function from_hackage
 	echo 'arch = []'
 	echo -n 'freedom = SOFTWARE | MEDIA ## FIX'
 	echo 'ME : set to actual freedoms!'
-	echo "license = [$(make_pyarray ${license[@]})]"
+	echo "license = [$(make_pyarray "${license[@]}")]"
 	echo "private = SUPPORTED"
     ) >&10
     
