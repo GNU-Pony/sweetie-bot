@@ -147,7 +147,7 @@ function from_hackage
     fi
     
     # Sanitise package name
-    _package="$(echo "${package}" | sed -e 'y:QWERTYUIOPASDFGHJKLZXCVBNM:qwertyuiopasdfghjklzxcvbnm:')" # lower case
+    _package="$(echo "${package,,}" )" # lower case
     pkgname="$(echo "${_package}" | sed -e 's:[^a-z0-9\._\+\-]::g' -e 's:^[\.\-]*::')" # valid symbols
     pkgname="${pkgname::64}" # the name cannot be longer than 64
     [ "${pkgname}" = "${_package}" ]
