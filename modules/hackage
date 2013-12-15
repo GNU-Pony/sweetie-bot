@@ -169,19 +169,40 @@ function from_hackage
     fi
     
     # Get license
-    license=( $(cat "${cabal_file}" | cabal_field license) )
+    license=( $(cat "${cabal_file}" | cabal_field license | vertical | fix_license ) )
 }
 
 
+# Print all words from stdin one separate lines in stdout
+function vertical
+{
+    while read line; do
+	for arg in ${line}; do
+	    echo ${arg}
+	done
+    done
+}
+
+
+# Change license names to those used in Spike scrolls
+function fix_license
+{
+    sed -e 's:^BSD3$:nBSD:g' \
+	-e 's:^BSD2$:sBSD:g' \
+	-e 's:^BSD4$:BSD:g'
+}
+
+
+# Read a top-level field in a cabal file
 function cabal_field
 {
-    echo "$x" | sed 's:\t: :g' | awk 'BEGIN {s = 0}
+    sed 's:\t: :g' | awk 'BEGIN {s = 0}
     {
        if ($0 ~ "^'"$1"' *:") {s = 1}
        else if ((s == 1) && ($0 ~ "^ ")) {s = 1}
        else {s = 0}
        if (s == 1) {print $0}
-    }' | sed -e ':a;N;$!ba;s:\n *: :g' -e 's:^'"$1"' *\:::g' |
+    }' | sed -e ':a;N;$!ba;s:\n *: :g' | sed -e 's:^'"$1"' *\:::g' |
          sed -e 's:^ *::g' -e 's: $::g' -e 's:  *: :g'
 }
 
