@@ -46,7 +46,7 @@ fi
 
 
 _dash="—"
-if [ "$TERM" = "linux" ]; then
+if [ "${TERM}" = "linux" ]; then
     _dash="-"
 fi
 
@@ -62,12 +62,12 @@ if [ "${__:0:5}" = "I am " ] || [ "${__:0:4}" = "I'm " ]; then
 fi
 
 for arg in "$@"; do
-    if [ "$arg" = "--water" ]; then
+    if [ "${arg}" = "--water" ]; then
 	echo "Augh, but the water makes me feel funny."
 	echo
-    elif [ "$arg" = "---out-conv" ]; then
+    elif [ "${arg}" = "---out-conv" ]; then
 	_out_conv=1
-    elif [ "$arg" = "--help" ] || [ "$arg" = "-h" ] || [ "$arg" = "-?" ]; then
+    elif [ "${arg}" = "--help" ] || [ "${arg}" = "-h" ] || [ "${arg}" = "-?" ]; then
 	cat <<.
 sweetie-bot ${_dash} Automated package repository cannibaliser
 
@@ -105,12 +105,12 @@ SETTINGS:
 	flock --unlock 100
 	exec 100<&-
 	exit 0
-    elif [ "$arg" = "--version" ] || [ "$arg" = "-v" ]; then
+    elif [ "${arg}" = "--version" ] || [ "${arg}" = "-v" ]; then
 	echo "Sweetie Bot v$VERSION"
 	flock --unlock 100
 	exec 100<&-
 	exit 0
-    elif [ "$arg" = "--copying" ] || [ "$arg" = "-c" ]; then
+    elif [ "${arg}" = "--copying" ] || [ "${arg}" = "-c" ]; then
 	cat <<.
 sweetie-bot — Automated package repository cannibaliser
 
@@ -133,7 +133,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	exec 100<&-
 	exit 0
     else
-	_args+=( "$arg" )
+	_args+=( "${arg}" )
     fi
 done
 
@@ -158,12 +158,12 @@ echo
 _distro=''
 if [[ ! "${DISTRO}" =~ ^([Gg][Nn][Uu][/+-][Pp][Oo][Nn][Yy]|)$ ]]; then
     _distro="${MODULE_DIR}/${DISTRO}"
-    if [ ! -e "$_distro" ]; then
+    if [ ! -e "${_distro}" ]; then
 	echo "Cannot locate output module ${DISTRO}."
 	flock --unlock 100
 	exec 100<&-
 	exit 1
-    elif [ ! -f "$_distro" ]; then
+    elif [ ! -f "${_distro}" ]; then
 	echo "Output module ${DISTRO} is not a regular file."
 	flock --unlock 100
 	exec 100<&-
@@ -171,7 +171,7 @@ if [[ ! "${DISTRO}" =~ ^([Gg][Nn][Uu][/+-][Pp][Oo][Nn][Yy]|)$ ]]; then
     fi
 fi
 
-if [ -L "$MODULE_DIR" ]; then
+if [ -L "${MODULE_DIR}" ]; then
     _scan='find -L'
 else
     _scan="find"
@@ -181,18 +181,18 @@ MODULES=()
 
 echo 'Scanning...'
 
-for module in $($_scan $MODULE_DIR | grep -v "~$"); do
-    if [ ! "$module" = "$MODULE_DIR" ]; then
-        MODULES+=( "$module" )
+for module in $(${_scan} ${MODULE_DIR} | grep -v "~$"); do
+    if [ ! "${module}" = "${MODULE_DIR}" ]; then
+        MODULES+=( "${module}" )
     fi
 done
 
 for exit_value in ${PIPESTATUS[*]}; do
-    if [ ! $exit_value = 0 ]; then
+    if [ ! ${exit_value} = 0 ]; then
 	echo 'Oops, an error has occurred.'
 	flock --unlock 100
 	exec 100<&-
-	exit $exit_value
+	exit ${exit_value}
     fi
 done
 
@@ -208,8 +208,8 @@ fi
 echo 'The fun levels will be at maximum efficiency!'
 echo 'I should locate my ignore list, settings other objects of FUN.'
 
-if [ -e "$CONFFILE" ]; then
-    . "$CONFFILE"
+if [ -e "${CONFFILE}" ]; then
+    . "${CONFFILE}"
 fi
 
 if [ ! "$1" = '' ]; then
@@ -223,7 +223,7 @@ _sorted=()
 for mod in "${MODULES[@]}"; do
     echo "${mod:${#MODULE_DIR}}"
 done | sort | while read mod; do
-    _sorted+=( "$mod" )
+    _sorted+=( "${mod}" )
 done
 MODULES=( "${_sorted[@]}" )
 
@@ -238,9 +238,9 @@ done
 
 _sorted=()
 for mod in "${IGNORE[@]}"; do
-    echo "$mod"
+    echo "${mod}"
 done | sort | while read mod; do
-    _sorted+=( "$mod" )
+    _sorted+=( "${mod}" )
 done
 IGNORE=( "${_sorted[@]}" )
 
@@ -286,7 +286,7 @@ function push
 
 comm -23 <(list "${MODULES[@]}") <(list "${IGNORE[@]}") | while read module; do
     echo "Running ${module} module, the changes of success are at 100 %!"
-    . "$module"
+    . "${module}"
     if [ ! $? = 0 ]; then
 	echo -e '\e[31mHelp, assistence is required. I believe there is something wrong with me!\e[00m'
     else
