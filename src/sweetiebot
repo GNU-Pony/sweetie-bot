@@ -156,7 +156,7 @@ echo
 echo
 
 _distro=''
-if [[ ! "${DISTRO}" =~ ^([Gg][Nn][Uu][/+-][Pp][Oo][Nn][Yy]|)$ ]]; then
+if [[ ! "${DISTRO,,}" =~ ^(gnu[/+-]pony|)$ ]]; then
     _distro="${MODULE_DIR}/${DISTRO}"
     if [ ! -e "${_distro}" ]; then
 	echo "Cannot locate output module ${DISTRO}."
