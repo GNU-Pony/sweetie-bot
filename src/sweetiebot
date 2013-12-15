@@ -228,11 +228,11 @@ done
 MODULES=( "${_sorted[@]}" )
 
 for exit_value in ${PIPESTATUS[*]}; do
-    if [ ! $exit_value = 0 ]; then
+    if [ ! ${exit_value} = 0 ]; then
 	echo 'My primary function is failure!'
 	flock --unlock 100
 	exec 100<&-
-	exit $exit_value
+	exit ${exit_value}
     fi
 done
 
@@ -245,11 +245,11 @@ done
 IGNORE=( "${_sorted[@]}" )
 
 for exit_value in ${PIPESTATUS[*]}; do
-    if [ ! $exit_value = 0 ]; then
+    if [ ! ${exit_value} = 0 ]; then
 	echo 'My primary function is failure!'
 	flock --unlock 100
 	exec 100<&-
-	exit $exit_value
+	exit ${exit_value}
     fi
 done
 
@@ -258,7 +258,7 @@ echo 'I have arranged objects in an estatically pleasing manner.'
 function list
 {
     for element in "$@"; do
-	echo "$element"
+	echo "${element}"
     done | sort
 }
 
